@@ -37,6 +37,11 @@ void TCSSelectClear()
 	//TCSS2High();
 	//TCSS3Low();
 }
+void off()
+{
+	PORTB = 0xFF;
+	PORTD = 0xFF;
+}
 
 
 
@@ -108,11 +113,15 @@ uint32_t TCSMeasure()
 
 int main(void)
 {
-	//DDRD = 0x00;
+	DDRD = 0xFF;
 	DDRA = 0b11110111;
 	DDRB = 0xFF;
 	PORTA = ( 1 << PINA4);
-	PORTA = ( 1 << PINA5);
+	//PORTA = ( 1 << PINA5);
+
+	TCCR1A |= 1<<WGM11 | 1<<COM1A1 | 1<<COM1A0 | 1<<COM1B1 | 1<<COM1B0 ;
+	TCCR1B |= 1<<WGM13 | 1<<WGM12 | 1<<CS10;
+	ICR1 = 19999;
 	
 	//PORTB = 0xFF;
 	//DDRC = 0xFF;
@@ -123,11 +132,14 @@ int main(void)
 	while(1)
 	{
 		
-		int r,g,b;
+		_delay_ms(2000);
+		
+		int r,g,b,c;
 
 		r=MeasureR();
 		g=MeasureG();
 		b=MeasureB();
+		c=MeasureC();
 
 		int smallest;
 
@@ -145,6 +157,12 @@ int main(void)
 			else
 			smallest=g;
 		}
+		/*if(c>smallest)
+		{
+			smallest=c;
+		}*/
+		
+		
 	/*	if( r >= 11000)
 		{
 			PORTB=0b00000010;
@@ -156,22 +174,54 @@ int main(void)
 		// smallest = g;
 			
 		}*/
-
+   
+   
  		if(smallest==g)
  		{
- 			PORTB = ( 1 << PINB1);
+			  OCR1B = 19200;//color header
+			  _delay_ms(1000);
+			  OCR1A = 19100;//ball mover
+			
+			 PORTB = ( 1 << PINB3);
+			 _delay_ms(1000);
+			 OCR1A = 17800;//ball initial position
+			 
+			 
+ 			
  		}
  		else if(smallest==r)
  		{
-			PORTB = ( 1<< PINB0);
+			   OCR1B = 18700;//color header
+			   _delay_ms(1000);
+			  OCR1A = 19100;//ball mover
+			
+			 PORTB = ( 1<< PINB2);
+			  _delay_ms(1000);
+			 OCR1A = 17800;//ball init pos.
+			
+			
+			
  		}
  		else if(smallest == b)
  		{
- 			PORTB = ( 1 << PINB2);
+			  OCR1B = 18150;
+			  _delay_ms(1000);
+			  OCR1A = 19100;
+			
+			PORTB = ( 1 << PINB4);
+			_delay_ms(1000);
+			 OCR1A = 17800;
+			 
+ 		
  		}
- 		
- 		
+//  		else if(smallest == c)
+// 		 {
+// 			 PORTB = 0x00;
+// 		 }
+//  		
 		
+	
+
 	}
 
 }
